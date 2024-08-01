@@ -1,0 +1,29 @@
+image: hashicorp/terraform:latest
+
+stages:
+  - build
+  - deploy
+  - destroy
+
+variables:
+  TF_STATE_BUCKET: "8839b8034015bafdd211314620bd06d612441ea3"  # Замените на ваш GitLab проект ID или название бакета
+
+before_script:
+  - terraform --version
+  - terraform init -backend-config="bucket=$TF_STATE_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=us-east-1"
+
+build:
+  stage: build
+  script:
+    - terraform validate
+
+deploy:
+  stage: deploy
+  script:
+    - terraform apply -auto-approve
+
+destroy:
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve
+  when: manual
